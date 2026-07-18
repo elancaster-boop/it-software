@@ -51,10 +51,25 @@ Write-Log "Files verified - copying to install location..."
 New-Item -ItemType Directory -Path 'C:\Program Files (x86)\PFU\ScanSnap\Home' -Force | Out-Null
 Copy-Item 'C:\Temp\ScanSnapHomeFiles\*' 'C:\Program Files (x86)\PFU\ScanSnap\Home\' -Recurse -Force
 Write-Log "Copy complete"
+$scanSnapExe = 'C:\Program Files (x86)\PFU\ScanSnap\Home\PfuSshMain.exe'
+$ws = New-Object -ComObject WScript.Shell
+$startMenuPath = 'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\ScanSnap'
+New-Item -ItemType Directory -Path $startMenuPath -Force | Out-Null
+$s1 = $ws.CreateShortcut("$startMenuPath\ScanSnap Home.lnk")
+$s1.TargetPath = $scanSnapExe
+$s1.WorkingDirectory = 'C:\Program Files (x86)\PFU\ScanSnap\Home'
+$s1.IconLocation = $scanSnapExe
+$s1.Save()
+$s2 = $ws.CreateShortcut('C:\Users\Public\Desktop\ScanSnap Home.lnk')
+$s2.TargetPath = $scanSnapExe
+$s2.WorkingDirectory = 'C:\Program Files (x86)\PFU\ScanSnap\Home'
+$s2.IconLocation = $scanSnapExe
+$s2.Save()
+Write-Log "Shortcuts created"
 if (Test-Path 'C:\Program Files (x86)\PFU\ScanSnap\Home\PfuSshMain.exe') {
-    Write-Log "SUCCESS: ScanSnap files installed"
+    Write-Log "SUCCESS: ScanSnap installed"
 } else {
-    Write-Log "WARNING: PfuSshMain.exe not found after copy"
+    Write-Log "WARNING: PfuSshMain.exe not found"
 }
 Remove-Item $zip -Force -ErrorAction SilentlyContinue
 cmd /c rmdir /s /q "C:\Temp\ScanSnapHomeFiles" 2>$null
